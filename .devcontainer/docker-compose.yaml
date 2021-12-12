@@ -1,0 +1,17 @@
+# Use root/example as user/password credentials
+version: '3.1'
+
+services:
+
+  web:
+    build:
+      context: ../
+      dockerfile: ./.devcontainer/web/Dockerfile 
+    volumes:
+      - ..:/workspace:cached
+    command: sleep infinity
+    network_mode: service:redis
+
+  redis:
+    image: 'redis:latest'
+

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search the Works of Shakespeare for any word</title>
+    
+</head>
+<body>
+    <script>
+        function make_request() {
+            var before = Date.now();
+            xmlhttp = new XMLHttpRequest();
+            var data = { 
+                search: document.getElementById("toSearchFor").value,
+                expireAt: document.getElementById("expireAt").value 
+            };
+            console.log(data);
+            xmlhttp.open("POST", "{{endpoint}}");
+            xmlhttp.setRequestHeader("Content-Type", "application/json");
+            xmlhttp.send(JSON.stringify(data));
+
+            xmlhttp.onload = function() {
+                document.getElementById("results").innerHTML = xmlhttp.responseText
+                var after = Date.now() - before;
+                document.getElementById("timing").innerHTML = `Request Time(ms): ${after}`;
+                console.log(xmlhttp.responseText);
+            }
+        }
+
+        function flush_cache() {
+            document.getElementById("status").innerHTML = "clearing...";
+            xmlhttp = new XMLHttpRequest();
+            xmlhttp.open("POST", "/reset-redis-cache");
+            xmlhttp.send();
+
+            xmlhttp.onload = function() {
+                document.getElementById("status").innerHTML = "CLEARED!!!";
+            }
+        }
+
+        function use_cache() {
+            window.location = './use-cache'
+        }
+
+        function no_cache() {
+            window.location = './'
+        }
+    </script>
+    <h1>My Webpage</h1>
+
+    <h2>{{current}}</h2>
+
+    <h5 id="status"></h5>
+    <input type="button" value="CLEAR CACHE" onclick="return flush_cache()"/>
+    <input type="button" value="USE CACHE" onclick="return use_cache()"/>
+    <input type="button" value="DO NOT USE CACHE" onclick="return no_cache()"/>
+    <br/>
+    
+
+    <h5>Text to search for: </h5><input type="text" id="toSearchFor"/>
+    <h5>Expiration time of cache (if it used): </h5><input type="text" id="expireAt" value="10"/>
+    <input type="button" value="Submit!" onclick="return make_request()"/>
+
+    <h3>Results</h3>
+    <h5 id="timing"></h5>
+    <h5 id="results"></h5>
+
+    {# a comment #}
+</body>
+</html>
